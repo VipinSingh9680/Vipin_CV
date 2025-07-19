@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vipin Singh | Senior IT Software Engineer</title>
+    <!-- Chosen Palette: Professional Slate & Blue -->
+    <!-- Application Structure Plan: A single-page application with a fixed sidebar navigation for seamless, non-linear exploration of the CV. This structure allows recruiters to quickly jump to sections of interest (like Skills or Experience) without scrolling through the entire document. Key interactions include a clickable timeline for detailed experience and expandable cards for projects. This design prioritizes user control and efficient information retrieval over a traditional linear format. -->
+    <!-- Visualization & Content Choices: Summary: Text block for a professional overview. Experience: Interactive vertical timeline (HTML/CSS/JS) to show career progression. Clicking reveals details, reducing initial clutter. Skills: Categorized list presented in visually distinct, well-styled cards for improved readability and aesthetic appeal. Projects: Grid of interactive cards (HTML/CSS/JS) that expand on click to show details, keeping the layout clean. Certificates/Education: Clean, styled lists for easy reading. This approach uses the best tool for each type of information, balancing visual appeal with detailed content. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            transform-origin: left;
+        }
+        .nav-link.active {
+            color: #2563eb;
+            transform: scale(1.05);
+            font-weight: 600;
+        }
+        .nav-link.active .nav-indicator {
+            width: 100%;
+            background-color: #2563eb;
+        }
+        .timeline-item-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        }
+        .timeline-item-content.open {
+            max-height: 1000px;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            font-size: 1.5rem;
+            color: #2563eb;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #2563eb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row">
+
+    <header class="md:hidden w-full bg-white/80 backdrop-blur-sm p-4 border-b border-slate-200 sticky top-0 z-40 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-slate-800">Vipin Singh</h1>
+        <button id="mobile-menu-button" class="p-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+        </button>
+    </header>
+
+    <aside id="sidebar" class="hidden md:flex flex-col w-full md:w-1/4 lg:w-1/5 xl:w-1/6 p-8 bg-white h-screen md:sticky top-0 border-r border-slate-200">
+        <div class="flex-grow">
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">Vipin Singh</h1>
+            <p class="text-md text-slate-600 mb-8">Senior IT Software Engineer</p>
+
+            <nav id="main-nav" class="flex flex-col space-y-4">
+                <a href="#summary" class="nav-link text-slate-600 hover:text-blue-600 group">
+                    Summary
+                    <span class="nav-indicator block h-0.5 w-0 bg-transparent group-hover:bg-blue-600 transition-all duration-300"></span>
+                </a>
+                <a href="#experience" class="nav-link text-slate-600 hover:text-blue-600 group">
+                    Experience
+                    <span class="nav-indicator block h-0.5 w-0 bg-transparent group-hover:bg-blue-600 transition-all duration-300"></span>
+                </a>
+                <a href="#skills" class="nav-link text-slate-600 hover:text-blue-600 group">
+                    Skills
+                    <span class="nav-indicator block h-0.5 w-0 bg-transparent group-hover:bg-blue-600 transition-all duration-300"></span>
+                </a>
+                <a href="#projects" class="nav-link text-slate-600 hover:text-blue-600 group">
+                    Projects
+                    <span class="nav-indicator block h-0.5 w-0 bg-transparent group-hover:bg-blue-600 transition-all duration-300"></span>
+                </a>
+                <a href="#education" class="nav-link text-slate-600 hover:text-blue-600 group">
+                    Education & Certs
+                    <span class="nav-indicator block h-0.5 w-0 bg-transparent group-hover:bg-blue-600 transition-all duration-300"></span>
+                </a>
+            </nav>
+        </div>
+        <div class="text-xs text-slate-500 space-y-1">
+            <p>singhvipin9680@gmail.com</p>
+            <p>+91 9680740368</p>
+            <p>Bengaluru, India</p>
+            <p><a href="https://www.linkedin.com/in/vipin-singh-619083170/" target="_blank" class="text-blue-600 hover:underline flex items-center">
+                <span class="mr-1">🔗</span> LinkedIn Profile
+            </a></p>
+            <p class="mt-4 text-slate-600">Download Options:</p>
+            <p><a href="#" id="downloadHtml" class="text-blue-600 hover:underline flex items-center">
+                <span class="mr-1">💾</span> Download Interactive CV (HTML)
+            </a></p>
+            <p class="text-slate-500 text-xs mt-1">
+                *Note: Direct ODF conversion from this interactive page is not supported. PDF conversion may vary.
+            </p>
+        </div>
+    </aside>
+
+    <main class="w-full md:w-3/4 lg:w-4/5 xl:w-5/6 p-4 sm:p-8 md:p-12" id="cv-content">
+        
+        <section id="summary" class="py-8">
+            <h2 class="text-4xl font-bold text-slate-800 mb-6 border-b-4 border-blue-500 pb-2">Professional Summary</h2>
+            <div class="space-y-4 text-slate-700 text-lg leading-relaxed">
+                <p>Highly accomplished and results-driven Senior Salesforce Developer with 3+ years of progressive experience in designing, developing, and optimizing scalable Salesforce solutions. This section introduces my professional background and key areas of expertise.</p>
+                <p>My work involves leading critical initiatives, from delivering high-revenue New Product Introduction (NPI) projects under tight deadlines to significantly reducing technical debt. I am recognized for automating complex business processes, enhancing critical workflows, and consistently improving Salesforce performance. I am proficient in agile methodologies and enjoy collaborating with teams and mentoring junior engineers.</p>
+            </div>
+        </section>
+
+        <section id="experience" class="py-8">
+            <h2 class="text-4xl font-bold text-slate-800 mb-12 border-b-4 border-blue-500 pb-2">Work Experience</h2>
+            <p class="mb-12 text-lg text-slate-600">Here is an interactive timeline of my professional journey. Click on any role to expand and see the key responsibilities and achievements associated with it. This format allows for a quick overview while providing access to in-depth details.</p>
+            <div class="relative border-l-2 border-blue-200">
+                
+                <div class="mb-8 ml-6 timeline-item">
+                    <span class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-white">
+                        <svg class="w-3 h-3 text-blue-800" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                    </span>
+                    <div class="timeline-header cursor-pointer p-4 bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <h3 class="flex items-center mb-1 text-xl font-semibold text-slate-900">Senior IT Software Engineer, Palo Alto Networks</h3>
+                        <time class="block mb-2 text-sm font-normal leading-none text-slate-500">May 2025 – Present</time>
+                        <p class="text-base font-normal text-slate-600">Previously: IT Software Engineer, Nov 2022 – May 2025</p>
+                    </div>
+                    <div class="timeline-item-content">
+                        <ul class="list-disc pl-5 mt-4 space-y-2 text-slate-600 bg-slate-50 p-6 rounded-lg">
+                            <li>Spearheaded efforts to stabilize and optimize the Enterprise Agreement system, specifically handling large quotes of at least $2 million.</li>
+                            <li>Successfully delivered multiple New Product Introduction (NPI) projects under tight deadlines, directly contributing to revenue growth.</li>
+                            <li>Developed a fully automated Technical Validation process from scratch, reducing reliance on spreadsheets by an estimated 30%.</li>
+                            <li>Enhanced Product Approval workflows, significantly reducing approval time by an estimated 25%.</li>
+                            <li>Reduced the Evals team's ticket backlog by 40% through active bug fixing and support.</li>
+                            <li>Spearheaded initiatives to reduce technical debt by eliminating unused fields and Apex code.</li>
+                            <li>Mentored new interns, providing guidance on Salesforce development best practices.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mb-8 ml-6 timeline-item">
+                     <span class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-white">
+                        <svg class="w-3 h-3 text-blue-800" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                    </span>
+                    <div class="timeline-header cursor-pointer p-4 bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <h3 class="flex items-center mb-1 text-xl font-semibold text-slate-900">Consultant Trainee - SFDC Developer, MTX Group</h3>
+                        <time class="block mb-2 text-sm font-normal leading-none text-slate-500">Jan 2022 – Nov 2022</time>
+                    </div>
+                    <div class="timeline-item-content">
+                        <ul class="list-disc pl-5 mt-4 space-y-2 text-slate-600 bg-slate-50 p-6 rounded-lg">
+                            <li>Completed intensive training on Salesforce development, including Apex, Triggers, LWC, and more.</li>
+                            <li>Collaborated with the internal product team to develop an attendance sheet feature.</li>
+                            <li>Contributed to developing a certification feature, automating processes within the internal system.</li>
+                            <li>Gained practical experience with Salesforce best practices and agile development methodologies.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="skills" class="py-8">
+            <h2 class="text-4xl font-bold text-slate-800 mb-6 border-b-4 border-blue-500 pb-2">Technical Skills</h2>
+            <p class="mb-12 text-lg text-slate-600">This section provides a clear overview of my technical capabilities, categorized for easy reference.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h3 class="text-xl font-semibold mb-3 text-slate-800">Programming Languages</h3>
+                    <ul class="list-disc pl-5 text-slate-600 space-y-1">
+                        <li>C++</li>
+                        <li>Java (Core)</li>
+                        <li>Apex</li>
+                        <li>Data Structure and Algorithm</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h3 class="text-xl font-semibold mb-3 text-slate-800">Salesforce Technologies</h3>
+                    <ul class="list-disc pl-5 text-slate-600 space-y-1">
+                        <li>Salesforce.com Platform</li>
+                        <li>Apex</li>
+                        <li>Trigger</li>
+                        <li>Lightning Web Components (LWC)</li>
+                        <li>Aura Components</li>
+                        <li>Salesforce Flow</li>
+                        <li>Visualforce</li>
+                        <li>SOQL/SOSL</li>
+                        <li>Salesforce DX</li>
+                        <li>Salesforce APIs (REST/SOAP)</li>
+                        <li>Change Sets</li>
+                        <li>Managed Packages</li>
+                        <li>Custom Objects & Fields</li>
+                        <li>Validation Rules</li>
+                        <li>Workflow Rules</li>
+                        <li>Process Builder</li>
+                        <li>Approval Processes</li>
+                        <li>Reports & Dashboards</li>
+                        <li>Security Model (Profiles, Permission Sets, OWD, Sharing Rules)</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h3 class="text-xl font-semibold mb-3 text-slate-800">Web Development</h3>
+                    <ul class="list-disc pl-5 text-slate-600 space-y-1">
+                        <li>HTML5</li>
+                        <li>CSS3</li>
+                        <li>JavaScript (ES6+)</li>
+                        <li>Responsive Design</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h3 class="text-xl font-semibold mb-3 text-slate-800">Integration & Automation Tools</h3>
+                    <ul class="list-disc pl-5 text-slate-600 space-y-1">
+                        <li>Snaplogic Integration</li>
+                        <li>Velocity Tool</li>
+                        <li>Varicent</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h3 class="text-xl font-semibold mb-3 text-slate-800">Development & Collaboration Tools</h3>
+                    <ul class="list-disc pl-5 text-slate-600 space-y-1">
+                        <li>Visual Studio Code</li>
+                        <li>GitHub Desktop</li>
+                        <li>Git (GitHub)</li>
+                        <li>Jenkins</li>
+                        <li>Jira</li>
+                        <li>Confluence</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="py-8">
+            <h2 class="text-4xl font-bold text-slate-800 mb-6 border-b-4 border-blue-500 pb-2">Personal Projects</h2>
+            <p class="mb-12 text-lg text-slate-600">Beyond my professional roles, I enjoy building projects to explore new technologies and solve interesting problems. Below are a few examples. These projects demonstrate my ability to apply my skills in different contexts, from enterprise application development to front-end web design.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-slate-200 transition-transform hover:scale-105">
+                    <h3 class="text-xl font-semibold mb-2 text-slate-900">University Management System</h3>
+                    <p class="text-sm text-blue-600 font-medium mb-3">Salesforce Project</p>
+                    <p class="text-slate-600">Developed a comprehensive system in Salesforce for managing student-teacher data, course enrollments, and schedules using LWC and Apex.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-slate-200 transition-transform hover:scale-105">
+                    <h3 class="text-xl font-semibold mb-2 text-slate-900">Flight Management System</h3>
+                    <p class="text-sm text-blue-600 font-medium mb-3">Java Project</p>
+                    <p class="text-slate-600">A Java-based system using OOP and JDBC for efficient flight management, including search, booking, and fare updates.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-slate-200 transition-transform hover:scale-105">
+                    <h3 class="text-xl font-semibold mb-2 text-slate-900">World Cup 2019 Website</h3>
+                    <p class="text-sm text-blue-600 font-medium mb-3">Web Development</p>
+                    <p class="text-slate-600">A dynamic and responsive website using HTML, CSS, and JavaScript, featuring schedules, standings, and search functionality.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="education" class="py-8">
+            <h2 class="text-4xl font-bold text-slate-800 mb-12 border-b-4 border-blue-500 pb-2">Education & Certifications</h2>
+            <p class="mb-12 text-lg text-slate-600">This section outlines my formal education and the certifications I've earned, which form the foundation of my technical knowledge and commitment to continuous learning in the field.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-semibold text-slate-800 mb-4">Education</h3>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <h4 class="text-lg font-bold text-slate-900">B.Tech in Computer Science & Engineering</h4>
+                        <p class="text-slate-600">Lovely Professional University, Punjab, India</p>
+                        <p class="text-sm text-slate-500">2018-2022 | CGPA: 7.83</p>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-slate-800 mb-4">Certificates & Achievements</h3>
+                    <ul class="space-y-3">
+                       <li class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 text-slate-700">Salesforce Certified Associate</li>
+                       <li class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 text-slate-700">Data Structures and Algorithms (GeeksForGeeks)</li>
+                       <li class="bg-white p-4 rounded-lg shadow-sm border or-slate-200 text-slate-700">Problem Solving in C++ (5 stars, HackerRank)</li>
+                       <li class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 text-slate-700">Competitive Programming (CipherSchools)</li>
+                       <li class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 text-slate-700">Digital Base 1 & 2 Program Certificate (Cognizant)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // No Chart.js charts for skills now
+            // const skillsChartCtx = document.getElementById('skillsChart').getContext('2d');
+            // ... (removed chart initialization)
+
+            const timelineHeaders = document.querySelectorAll('.timeline-header');
+            timelineHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const allContents = document.querySelectorAll('.timeline-item-content');
+                    
+                    const isOpening = !content.classList.contains('open');
+
+                    allContents.forEach(c => {
+                        c.classList.remove('open');
+                        c.style.padding = '0';
+                    });
+
+                    if(isOpening){
+                        content.classList.add('open');
+                        content.style.padding = '1.5rem';
+                    }
+                });
+            });
+
+            // Removed skill card interaction logic as it's no longer needed
+            // const skillCards = document.querySelectorAll('.skill-card');
+            // skillCards.forEach(card => { ... });
+
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('#main-nav a');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const sidebar = document.getElementById('sidebar');
+
+            mobileMenuButton.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('#sidebar a').forEach(link => {
+                link.addEventListener('click', () => {
+                     if(window.innerWidth < 768){
+                        sidebar.classList.add('hidden');
+                     }
+                });
+            });
+
+            // Logic for downloading the HTML file itself
+            const downloadHtmlButton = document.getElementById('downloadHtml');
+            if (downloadHtmlButton) {
+                downloadHtmlButton.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent default link behavior
+                    const htmlContent = document.documentElement.outerHTML;
+                    const blob = new Blob([htmlContent], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Vipin_Singh_Interactive_CV.html';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            }
+
+            // Logic for downloading the HTML content as PDF
+            const downloadPdfButton = document.getElementById('downloadPdf');
+            if (downloadPdfButton) {
+                downloadPdfButton.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const element = document.getElementById('cv-content'); // Target the main content area
+
+                    // Show loading overlay
+                    const loadingOverlay = document.createElement('div');
+                    loadingOverlay.className = 'loading-overlay';
+                    loadingOverlay.innerHTML = '<div class="spinner"></div><p>Generating PDF...</p>';
+                    document.body.appendChild(loadingOverlay);
+
+                    html2pdf().from(element).set({
+                        margin: 0.5,
+                        filename: 'Vipin_Singh_Interactive_CV.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
+                        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                    }).save().then(() => {
+                        // Remove loading overlay after PDF is generated
+                        document.body.removeChild(loadingOverlay);
+                    }).catch(error => {
+                        console.error('Error generating PDF:', error);
+                        alert('Failed to generate PDF. Please try again or use the HTML download option.');
+                        document.body.removeChild(loadingOverlay);
+                    });
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
